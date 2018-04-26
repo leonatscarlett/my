@@ -23,8 +23,8 @@ def initConfig():
 
 	setCell( "vk_AddFriends", 0 ) # Автоматически добавлять новых пользователей в друзья?
 
-	setCell( "vk_login", "+79585354913" ) # Логин от аккаунта ВК
-	setCell( "vk_password", "remilia" ) # Пароль от аккаунта ВК
+	setCell( "vk_login", "+79106116852" ) # Логин от аккаунта ВК
+	setCell( "vk_password", "scarlet" ) # Пароль от аккаунта ВК
 
 	setCell( "telegram_token", "470919092:AAHUO4Uvk2MnTKHnJn-7FZ6dRmZjrd9KtdY" ) # Токен ботинка в Telegram
 
@@ -56,9 +56,11 @@ def initConfig():
 	#############################################################
 
 
-	setCell( "vk_1", '@group3stom' ) # Пример переадресации из чата ВК в Telegram
+	setCell( "vk_30", '@group3stom' ) # Пример переадресации из чата ВК в Telegram
 	setCell( "t_-233541156", '1' ) # Пример переадресации из чата ВК в Telegram
 	# P.S. В нашем случае 1 - 'локальный' ID чата для аккаунта ВК
 
 	setCell( "vk_182958319", '-group3stom' ) # Пример переадресации из чата ВК в Telegram
 	setCell( "t_-233541156", '182958319' ) # Пример переадресации из чата ВК в Telegram
+  setCell( "vk_31", '@starostyhuyarosty')
+  setCell( " vk_41",'@starostyhuyarosty')
