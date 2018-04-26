@@ -55,10 +55,17 @@ def initConfig():
 	########                                             ########
 	#############################################################
 
-
 setCell( "vk_30", '@group3stom' ) # Пример переадресации из чата ВК в Telegram
-setCell( "t_-233541156", '1' ) # Пример переадресации из чата ВК в Telegram
-setCell( "vk_31", '@starostyhuyarosty' ) # Пример переадресации из чата ВК в Telegram
-setCell( "t_-233541156", '1' ) # Пример переадресации из чата ВК в Telegram
-setCell( "vk_41", '@starostyhuyarosty' ) # Пример переадресации из чата ВК в Telegram
-setCell( "t_-233541156", '1' ) # Пример переадресации из чата ВК в Telegram
+
+	setCell( "t_-249416176", '1' ) # Пример переадресации из чата ВК в Telegram
+
+	# P.S. В нашем случае 1 - 'локальный' ID чата для аккаунта ВК
+
+	setCell( "vk_31", '@starostyhuyarosty' ) # Пример переадресации ЛС ВК в Telegram
+
+	setCell( "t_-236472090", '417110104' ) # Пример переадресации ЛС ВК в Telegram
+
+	setCell( "vk_41", '@starostyhuyarosty' ) # Шаблон
+
+	setCell( "t_-1", '111111' ) # Шаблон
+
