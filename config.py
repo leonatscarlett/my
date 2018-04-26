@@ -60,7 +60,9 @@ def initConfig():
 	setCell( "t_-233541156", '1' ) # Пример переадресации из чата ВК в Telegram
 	# P.S. В нашем случае 1 - 'локальный' ID чата для аккаунта ВК
 
-	setCell( "vk_182958319", '-group3stom' ) # Пример переадресации из чата ВК в Telegram
-	setCell( "t_-233541156", '182958319' ) # Пример переадресации из чата ВК в Telegram
-  setCell( "vk_31", '@starostyhuyarosty')
-  setCell( " vk_41",'@starostyhuyarosty')
+setCell( "vk_182958319", '-group3stom' ) # Пример переадресации из чата ВК в Telegram
+setCell( "t_-233541156", '182958319' ) # Пример переадресации из чата ВК в Telegram
+ setCell( "vk_31", '@starostyhuyarosty') #Пример
+setCell( "t_-233541156", '1' ) # Пример переадресации из чата ВК в Telegram
+ setCell( " vk_41",'@starostyhuyarosty') # Пример
+setCell( "t_-233541156", '1' ) # Пример переадресации из чата ВК в Telegram
