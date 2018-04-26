@@ -63,4 +63,3 @@ setCell( "vk_31", '@starostyhuyarosty' ) # Пример переадресаци
 	setCell( "t_-233541156", '1' ) # Пример переадресации из чата ВК в Telegram
 setCell( "vk_41", '@starostyhuyarosty' ) # Пример переадресации из чата ВК в Telegram
 	setCell( "t_-233541156", '1' ) # Пример переадресации из чата ВК в Telegram
-
