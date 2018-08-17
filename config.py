@@ -30,7 +30,7 @@ def initConfig():
 	setCell( "vk_login", "79009091940" ) # Логин от аккаунта ВК
 	setCell( "vk_password", "arcueido" ) # Пароль от аккаунта ВК
 
-	setCell( "telegram_token", "470919092:AAEv6z82YCbgU3iJqqTaffiQN2yOGJnKgKo" ) # Токен ботинка в Telegram
+	setCell( "telegram_token", "470919092:AAG0ynT2ik9V-nLrsAXW-8PQSypJUjfgRU8" ) # Токен ботинка в Telegram
 
 	setCell( "telegram_SendName", True ) # Отправлять в ВК текст с именем отправителя из Telegram
 
@@ -49,7 +49,7 @@ def initConfig():
 	# Они будут скапливаться в папке 'stickers'
 	setCell( "vk_sticker_EnableScale", True ) # Включить уменьшение стикера в ВК?
 	# Можно и не включать, но тогда стикер будет просто огромный
-	setCell( "vk_sticker_size", 200 ) # Развер стикера в ВК.
+	setCell( "vk_sticker_size", 300 ) # Развер стикера в ВК.
 	# Можно поэксперементировать с размерами, но 200 мне показался самым удачным
 	# P.S. Не забываем про то, что размер у залитых ранее стикеров не изменится!
 
