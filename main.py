@@ -15,6 +15,8 @@ config.initConfig()
 
 module = sys.modules[__name__]
 
+port = int(os.environ.get("PORT", 5000))
+
 # Код настоятельно рекомендуется читать снизу вверх!
 
 #    _______        _     

@@ -5,6 +5,8 @@ import os
 
 module = sys.modules[__name__]
 
+port = int(os.environ.get("PORT", 5000))
+
 def setCell( name, value ):
 	module.table[name] = value
 
