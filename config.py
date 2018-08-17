@@ -27,8 +27,13 @@ def initConfig():
 
 	setCell( "vk_AddFriends", False ) # Автоматически добавлять новых пользователей в друзья?
 
+<<<<<<< HEAD
 	setCell( "vk_login", "79009091940" ) # Логин от аккаунта ВК
 	setCell( "vk_password", "arcueido" ) # Пароль от аккаунта ВК
+=======
+	setCell( "vk_login", "+79106116852" ) # Логин от аккаунта ВК
+	setCell( "vk_password", "scarlet" ) # Пароль от аккаунта ВК
+>>>>>>> d87b19c70658182676d1799475696c980cb4704b
 
 	setCell( "telegram_token", "470919092:AAG0ynT2ik9V-nLrsAXW-8PQSypJUjfgRU8" ) # Токен ботинка в Telegram
 
@@ -80,11 +85,28 @@ def initConfig():
 	setCell( "vk_1", '-292073445' ) # Пример переадресации ЛС ВК в Telegram
 	setCell( "t_-292073445", '1' ) # Пример переадресации ЛС ВК в Telegram
 
+<<<<<<< HEAD
 	#setCell( "vk_1", '-249416176' ) # Пример переадресации из чата ВК в Telegram
 	#setCell( "t_-249416176", '1' ) # Пример переадресации из чата ВК в Telegram
+=======
+
+	setCell( "vk_30", '@group3stom' ) # Пример переадресации из чата ВК в Telegram
+
+>>>>>>> d87b19c70658182676d1799475696c980cb4704b
 	# P.S. В нашем случае 1 - 'локальный' ID чата для аккаунта ВК
 	
 	# P.S.S. Не забываем изменить/удалить примеры, а то может что-то пойти не так...
 
+<<<<<<< HEAD
 	#setCell( "vk_", '-' ) # Шаблон
 	#setCell( "t_-", '' ) # Шаблон
+=======
+	setCell( "vk_32", '@starostyhuyarosty' ) # Пример переадресации ЛС ВК в Telegram
+
+	setCell( "t_-236472090", '417110104' ) # Пример переадресации ЛС ВК в Telegram
+
+	setCell( "vk_41", '@starostyhuyarosty' ) # Шаблон
+
+	setCell( "t_-1", '111111' ) # Шаблон
+   
+>>>>>>> d87b19c70658182676d1799475696c980cb4704b
