@@ -1,6 +1,7 @@
+# This Python file uses the following encoding: utf-8
 #!/usr/bin/env python3.4
-import os
 import sys
+import os
 import config
 import db
 import datetime
@@ -16,13 +17,13 @@ module = sys.modules[__name__]
 
 # Код настоятельно рекомендуется читать снизу вверх!
 
-#    _______        _
-#   |__   __|      | |
-#      | | ___  ___| |__
-#      | |/ _ \/ __| '_ \
+#    _______        _     
+#   |__   __|      | |    
+#      | | ___  ___| |__  
+#      | |/ _ \/ __| '_ \ 
 #      | |  __/ (__| | | |
 #      |_|\___|\___|_| |_|
-#
+#                         
 #   Технические функции
 
 # Получаем текущее время
@@ -36,8 +37,15 @@ def current_time():
 
 # Получение имени пользователя
 def GetUserName( msg ):
-	dataname = module.vk.users.get( user_ids = msg.get('user_id' ) )
+	dataname = module.vk.users.get( user_ids = msg.get('from_id') )
 	UserName = str ( dataname[0]['first_name'] + ' ' + dataname[0]['last_name'] )
+	return UserName
+
+def GetUserTName( msg ):
+	if msg.last_name is None:
+		UserName = str( msg.first_name )
+	else:
+		UserName = str( msg.first_name + " " + msg.last_name )
 	return UserName
 
 # Проверка на наличие аттачментов в сообщении
@@ -114,46 +122,43 @@ def getAttachments( msg ):
 # Проверка чата ВК на различные события
 def CheckEvents( msg, chatid ):
 
-	if not( msg.get( 'action' ) ):
+	if not ( msg['last_message'].get( 'action' ) ):
 		return None # И так сойдёт
 
-	Event = msg.get( 'action' )
-	UserName = GetUserName( msg )
-	time = current_time()
+	Event = msg['last_message']['action'].get( 'type' )
+	UserName = GetUserName( msg['last_message'] )
 
 	# Ниже проверям наш чат на различные события
 	# См. https://vk.com/dev/objects/message
 
 	if Event == 'chat_title_update':
-		Object = str( msg.get( 'action_text' ) )
+		Object = str( msg['last_message']['action'].get( 'text' ) )
 		mbody = " *** " + UserName + " изменил(а) название беседы на " + Object + " ***"
-		TransferMessagesToTelegram( time, chatid, None, mbody, None )
 
 	elif Event == 'chat_invite_user':
-		dataname = module.vk.users.get( user_ids = msg.get( 'action_mid' ) )
+		dataname = module.vk.users.get( user_ids = msg['last_message']['action'].get( 'member_id' ) )
 		Object = str ( dataname[0]['first_name'] + ' ' + dataname[0]['last_name'] )
 		mbody = " *** " + UserName + " пригласил(а) в беседу " + Object + " ***"
-		TransferMessagesToTelegram( time, chatid, None, mbody, None )
 
 	elif Event == 'chat_kick_user':
-		dataname = module.vk.users.get( user_ids = msg.get( 'action_mid' ) )
+		dataname = module.vk.users.get( user_ids = msg['last_message']['action'].get( 'member_id' ) )
 		Object = str ( dataname[0]['first_name'] + ' ' + dataname[0]['last_name'] )
 		mbody = " *** " + UserName + " кикнул(а) из беседы " + Object + " ***"
-		TransferMessagesToTelegram( time, chatid, None, mbody, None )
 
 	elif Event == 'chat_photo_update':
-		Object = str( msg.get( 'photo_200' ) )
+		Object = str( msg['last_message'].get( 'photo_200' ) )
 		mbody = " *** " + UserName + " обновил(а) фото беседы: ***"
-		TransferMessagesToTelegram( time, chatid, None, mbody, None )
 
 	elif Event == 'chat_photo_remove':
 		mbody = " *** " + UserName + " удалил(а) фото беседы! ***"
-		TransferMessagesToTelegram( time, chatid, None, mbody, None )
 
 	elif Event == 'chat_create':
 		print( 'Беседа была создана!' )
 
-	return True
+	else:
+		return None
+
+	TransferMessagesToTelegram( chatid, None, mbody, None )
 
 # Проверка на наличие перешлённых сообщений
 def GetFwdMessages( msg, idd ):
@@ -162,14 +167,13 @@ def GetFwdMessages( msg, idd ):
 		return None # И так сойдёт
 
 	FwdList = []
-
 	FwdMsg = msg.get( 'fwd_messages' )
 
 	while not FwdMsg is None:
 
 		UserName = GetUserName( FwdMsg[0] )
 
-		FwdList.append( { 'body':FwdMsg[0].get( 'body' ), 'UserName':UserName } )
+		FwdList.append( { 'body':FwdMsg[0].get( 'text' ), 'UserName':UserName } )
 
 		CheckAttachments( FwdMsg[0], idd )
 
@@ -179,64 +183,43 @@ def GetFwdMessages( msg, idd ):
 
 	return FwdList
 
-#    _____          _ _               _
-#   |  __ \        | (_)             | |
-#   | |__) |___  __| |_ _ __ ___  ___| |_ ___
+#    _____          _ _               _       
+#   |  __ \        | (_)             | |      
+#   | |__) |___  __| |_ _ __ ___  ___| |_ ___ 
 #   |  _  // _ \/ _` | | '__/ _ \/ __| __/ __|
 #   | | \ \  __/ (_| | | | |  __/ (__| |_\__ \
 #   |_|  \_\___|\__,_|_|_|  \___|\___|\__|___/
-#
+#                                             
 #  Функции, принимающие и отправляющие сообщения ВК <==> Telegram
 
 def CheckRedirect_vk( msg ):
 
-	#print( msg )
+	chatid = str( msg['conversation']['peer']['local_id'] )
 
-	userid = str( msg.get( 'user_id' ) )
-	chatid = str( msg.get( 'chat_id' ) )
+	# Проверка на существование переадресации в конфиге
+	if not config.getCell( "vk_" + chatid ) is None:
 
-	#print( str( config.getCell( 'vk_' + chatid) ) )
+		ForwardMessage = GetFwdMessages( msg['last_message'], chatid )
 
-	# Сделано на костылях, это я знаю
-	# Возможно, когда-нибудь я займусь оптимизацией кода....
-	# ( Когда-нибудь... )
-
-	if not config.getCell( 'vk_' + chatid ) is None:
-
-		ForwardMessage = GetFwdMessages( msg, chatid )
-
-		time = current_time()
-		UserName = GetUserName( msg )
-		mbody = msg.get( 'body' )
+		UserName = GetUserName( msg['last_message'] )
+		mbody = msg['last_message'].get( 'text' )
 
 		# Чтобы при событии не посылалось пустое сообщение
 		if CheckEvents( msg, chatid ) is None:
-			TransferMessagesToTelegram( time, chatid, UserName, mbody, ForwardMessage )
-
-		# Проверка на аттачменты, пересланные сообщения, видео...
-		if ForwardMessage is None:
-			CheckAttachments( msg, chatid )
-
-		return False
-
-	elif not config.getCell( 'vk_' + userid ) is None:
-
-		ForwardMessage = GetFwdMessages( msg, userid )
-
-		time = current_time()
-		UserName = GetUserName( msg )
-		mbody = msg.get( 'body' )
-
-		TransferMessagesToTelegram( time, userid, UserName, mbody, ForwardMessage )
+			TransferMessagesToTelegram( chatid, UserName, mbody, ForwardMessage )
 
 		# Проверка на аттачменты, пересланные сообщения, видео...
 		# Проверка сделана, чтобы исключить повтор картинки
 		if ForwardMessage is None:
-			CheckAttachments( msg, userid )
+			CheckAttachments( msg['last_message'], chatid )
 
 		return False
 
-def TransferMessageToVK( chatid, text, Attachment ):
+def TransferMessageToVK( chatid, text, fromUser, Attachment ):
+
+	if ( config.getCell('telegram_SendName') ):
+		time = current_time()
+		text = str( time + ' | ' + fromUser + ': ' + text )
 
 	if Attachment is None:
 
@@ -265,20 +248,21 @@ def TransferMessageToVK( chatid, text, Attachment ):
 
 	return False
 
-def CheckRedirect_telegram( chatid, text, Attachment ):
+def CheckRedirect_telegram( chatid, text, fromUser, Attachment ):
 	if not config.getCell( 't_' + chatid ) is None:
-		TransferMessageToVK( chatid, text, Attachment )
+		TransferMessageToVK( chatid, text, fromUser, Attachment )
 		return False
 
 # Посылаем простые сообщения в Telegram
 # Идея: сделать в будущем наклонные столбики, теперь главное не забыть
-def TransferMessagesToTelegram( time, idd, UserName, mbody, FwdList ):
+def TransferMessagesToTelegram( idd, UserName, mbody, FwdList ):
 
 	# Условие выполняется в случае какого-либо события
 	if UserName is None:
 		module.bot.send_message( config.getCell( 'vk_' + idd ), str( mbody ) )
 		return False
 
+	time = current_time()
 	NiceText = str( time + ' | ' + UserName + ': ' + mbody )
 
 	if not FwdList is None:
@@ -318,16 +302,26 @@ def TransferAttachmentsToTelegram ( idd, attachments ):
 		else:
 			module.bot.send_message( config.getCell( 'vk_' + idd ), '( Неизвестный тип аттачмента )' )
 
-#   __      ___
-#   \ \    / / |
+#   __      ___    
+#   \ \    / / |   
 #    \ \  / /| | __
 #     \ \/ / | |/ /
-#      \  /  |   <
+#      \  /  |   < 
 #       \/   |_|\_\
-#
+#                  
 #
 
-def captcha_handler(captcha):
+# При двухфакторной аутентификации вызывается эта функция
+def auth_handler():
+
+	key = input("Enter authentication code: ")
+	# True - сохранить, False - не сохранять
+	remember_device = True
+
+	return key, remember_device
+
+# Каптча
+def captcha_handler( captcha ):
 	key = input( "Enter Captcha {0}: ".format( captcha.get_url() ) ).strip()
 	return captcha.try_again(key)
 
@@ -340,7 +334,7 @@ def init_vk():
 
 	global vk_session
 
-	vk_session = vk_api.VkApi( login, password, captcha_handler=captcha_handler )
+	vk_session = vk_api.VkApi( login, password, auth_handler=auth_handler, captcha_handler=captcha_handler )
 
 	try:
 		vk_session.auth()
@@ -352,7 +346,7 @@ def init_vk():
 	input_vk()
 
 def input_vk():
-
+	
 	while True:
 
 		try:
@@ -360,19 +354,14 @@ def input_vk():
 			module.vk.account.setOnline()
 
 			# Проверка на наличие подписчиков
-			if config.getCell( 'vk_AddFriends' ) == 1:
+			if ( config.getCell('vk_AddFriends') ):
 				checknewfriends()
 
-			rawMessages = module.vk.messages.get(out = 0, count = config.getCell('vk_msgForPick') )
+			rawMessages = module.vk.messages.getConversations( filter='unread', count=config.getCell('vk_msgForPick') )['items'][0]
+			msg = rawMessages['conversation']['peer']
+			module.vk.messages.markAsRead( messages_ids = msg['local_id'], peer_id = msg['id'] )
 
-			for msg in rawMessages['items']:
-				if msg['read_state'] == 0:
-					if not msg.get( 'chat_id' ) is None:
-						module.vk.messages.markAsRead(messages_ids = msg['id'], peer_id = 2000000000 + msg['chat_id'])
-					else:
-						module.vk.messages.markAsRead(messages_ids = msg['id'], peer_id = msg['user_id'])
-
-					CheckRedirect_vk( msg )
+			CheckRedirect_vk( rawMessages )
 
 		# Чтобы не вылетало, а работало дальше
 		except BaseException:
@@ -380,14 +369,14 @@ def input_vk():
 			continue
 
 
-#    _______   _
-#   |__   __| | |
-#      | | ___| | ___  __ _ _ __ __ _ _ __ ___
-#      | |/ _ \ |/ _ \/ _` | '__/ _` | '_ ` _ \
+#    _______   _                                
+#   |__   __| | |                               
+#      | | ___| | ___  __ _ _ __ __ _ _ __ ___  
+#      | |/ _ \ |/ _ \/ _` | '__/ _` | '_ ` _ \ 
 #      | |  __/ |  __/ (_| | | | (_| | | | | | |
 #      |_|\___|_|\___|\__, |_|  \__,_|_| |_| |_|
-#                      __/ |
-#                     |___/
+#                      __/ |                    
+#                     |___/                     
 
 
 def listener( messages ):
@@ -400,17 +389,16 @@ def listener( messages ):
 				module.bot.send_message( m.chat.id, str( m.chat.id ) )
 				continue
 
-			CheckRedirect_telegram( str( m.chat.id ), str( m.text ), None )
+			CheckRedirect_telegram( str( m.chat.id ), str( m.text ), GetUserTName(m.from_user), None )
 
 		elif m.content_type == 'sticker':
 
-			if config.getCell( 'vk_EnableStickers' ) != 1:
+			if not ( config.getCell('vk_EnableStickers') ):
 				return False
 
-			# Убираем ненужный на конце формат 'webp'
 			FilePath = module.bot.get_file( m.sticker.file_id ).file_path
 
-			CheckRedirect_telegram( str( m.chat.id ), str( m.text ), str( FilePath ) )
+			CheckRedirect_telegram( str( m.chat.id ), str( m.text ), GetUserTName(m.from_user), str( FilePath ) )
 
 
 def init_telegram():
@@ -420,16 +408,26 @@ def init_telegram():
 	input_telegram()
 
 def input_telegram():
-	module.bot.set_update_listener(listener)
+
+	if ( config.getCell('telegram_useProxy') ):
+		Proxy_type = str( config.getCell('p_type') )
+		Proxy_UserInfo = str( config.getCell('p_user') + ':' + config.getCell('p_password') )
+		Proxy_Data = str( config.getCell('p_host') + ':' + config.getCell('p_port') )
+		telebot.apihelper.proxy = { 
+		'http': '%s://%s@%s' % ( Proxy_type, Proxy_UserInfo, Proxy_Data ),
+		'https': '%s://%s@%s' % ( Proxy_type, Proxy_UserInfo, Proxy_Data )
+		}
+
+	module.bot.set_update_listener( listener )
 	while True: # Костыль на случай timeout'a
 		try:
 			module.bot.polling(none_stop=False)
 		except:
 			continue
 
-#    ______               _
-#   |  ____|             | |
-#   | |____   _____ _ __ | |_ ___
+#    ______               _       
+#   |  ____|             | |      
+#   | |____   _____ _ __ | |_ ___ 
 #   |  __\ \ / / _ \ '_ \| __/ __|
 #   | |___\ V /  __/ | | | |_\__ \
 #   |______\_/ \___|_| |_|\__|___/
@@ -442,14 +440,14 @@ def checknewfriends():
 	if newfriends['count'] != 0:
 		module.vk.friends.add( user_id= newfriends['items'] ) # Добавляем человека в друзья
 
-#     _____ _   _      _
-#    / ____| | (_)    | |
-#   | (___ | |_ _  ___| | _____ _ __ ___
+#     _____ _   _      _                 
+#    / ____| | (_)    | |                
+#   | (___ | |_ _  ___| | _____ _ __ ___ 
 #    \___ \| __| |/ __| |/ / _ \ '__/ __|
 #    ____) | |_| | (__|   <  __/ |  \__ \
 #   |_____/ \__|_|\___|_|\_\___|_|  |___/
-#
-#
+#                                        
+#                                        
 
 # Загрузка стикеров в ВК
 def AddStickerIntoVK( path, Sticker ):
@@ -460,7 +458,7 @@ def AddStickerIntoVK( path, Sticker ):
 	upload = vk_api.VkUpload( vk_session )
 	photo = upload.photo( OurFile + ".png", album_id = config.getCell( 'vk_album_id' ) )
 
-	if config.getCell( 'vk_detelestickers' ) == 1:
+	if ( config.getCell('vk_detelestickers') ):
 		os.remove( OurFile + ".png" )
 
 	OurVK = 'photo{}_{}'.format( photo[0]['owner_id'], photo[0]['id'] )
@@ -490,7 +488,7 @@ def SaveSticker( StickerURL, Attachment ):
 
 	img = Image.open(ImageWebp)
 
-	if config.getCell( 'vk_sticker_EnableScale' ) == 1:
+	if ( config.getCell('vk_sticker_EnableScale') ):
 		scale = config.getCell( 'vk_sticker_size' )
 		img.thumbnail((scale, scale))
 	img.save( ImageWebp + ".png", "PNG")
@@ -505,13 +503,13 @@ def SaveSticker( StickerURL, Attachment ):
 # Telegram та ещё поехавшая вещь, иногда аттачменты идут с расширением файла, иногда - без него
 # Из-за этого я долго не мог понять, почему одни стикеры отправляются нормально, а другие - выдают ошибку при отправке
 
-#    ______ _             _
-#   |  ____(_)           | |
-#   | |__   _ _ __   __ _| | ___
+#    ______ _             _      
+#   |  ____(_)           | |     
+#   | |__   _ _ __   __ _| | ___ 
 #   |  __| | | '_ \ / _` | |/ _ \
 #   | |    | | | | | (_| | |  __/
 #   |_|    |_|_| |_|\__,_|_|\___|
-#
+#                                
 # Пихаем функции в потоки
 
 t1 = threading.Thread( target=init_vk )
