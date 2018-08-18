@@ -221,7 +221,7 @@ def TransferMessageToVK( chatid, text, fromUser, Attachment ):
 
 	if ( config.getCell('telegram_SendName') ):
 		time = current_time()
-		text = str( time + ' | ' + fromUser + ': ' + text )
+		text = str( fromUser + ': ' + text )
 
 	if Attachment is None:
 
