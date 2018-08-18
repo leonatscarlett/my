@@ -240,11 +240,12 @@ def TransferMessageToVK( chatid, text, fromUser, Attachment ):
 			StickerURL = 'https://api.telegram.org/file/bot{0}/{1}'.format( config.getCell( 'telegram_token' ), Attachment )
 			SaveSticker( StickerURL, Attachment )
 			GetSticker = db.CheckSticker( Attachment )
+			text = str( fromUser + ': ' )
 
 		#print( GetSticker )
 
 		try:
-			module.vk.messages.send( chat_id = config.getCell( 't_' + chatid ), message = "fromUser + ': ' + text", attachment = GetSticker )
+			module.vk.messages.send( chat_id = config.getCell( 't_' + chatid ), message = text, attachment = GetSticker )
 		except vk_api.ApiError as error_msg:
 			module.vk.messages.send( user_id = config.getCell( 't_' + chatid ), message = "", attachment = GetSticker )
 
