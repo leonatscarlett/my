@@ -1,4 +1,4 @@
 pyTelegramBotAPI
 vk_api
 datetime
-Pillow
+Pillow==4.3.0
