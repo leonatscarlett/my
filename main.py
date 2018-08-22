@@ -290,6 +290,7 @@ def TransferAttachmentsToTelegram ( idd, attachments ):
 
 		if AttType == 'photo' or AttType == 'sticker':
 			module.bot.send_photo( config.getCell( 'vk_' + idd ), Link )
+			print( 'Фото!' )
 
 		elif AttType == 'doc' or AttType == 'gif' or AttType == 'audio':
 			module.bot.send_document( config.getCell( 'vk_' + idd ), Link )
