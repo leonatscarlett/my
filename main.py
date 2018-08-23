@@ -71,16 +71,8 @@ def getAttachments( msg ):
 		if AttType == 'photo': # Проверка на тип фотографии
 
 			# Различные типы фото
-			if Attachment.get( 'photo_2560' ):
-				attachments = Attachment.get( 'photo_2560' )
-			elif Attachment.get( 'photo_1280' ):
-				attachments = Attachment.get( 'photo_1280' )
-			elif Attachment.get( 'photo_604' ):
-				attachments = Attachment.get( 'photo_604' )
-			elif Attachment.get( 'photo_130' ):
-				attachments = Attachment.get( 'photo_130' )
-			elif Attachment.get( 'photo_75' ):
-				attachments = Attachment.get( 'photo_75' )
+			if Attachment.get( 'src' ):
+				attachments = Attachment.get( 'src' )
 
 		elif AttType == 'doc': # Проверка на тип документа:
 		# Про типы документов можно узнать тут: https://vk.com/dev/objects/doc
