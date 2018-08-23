@@ -92,8 +92,8 @@ def getAttachments( msg ):
 
 		elif AttType == 'sticker': # Проверка на стикеры:
 			# Можно 256 или 512, но будет слишком огромная пикча
-			if Attachment.get( 'photo_128' ):
-				attachments = Attachment.get( 'photo_128' )
+			if Attachment.get( 'sticker' ):
+				attachments = Attachment.get( 'sticker' )
 
 		elif AttType == 'audio':
 			if Attachment.get( 'url' ):
@@ -289,7 +289,7 @@ def TransferAttachmentsToTelegram ( idd, attachments ):
 		Link = j.get( 'link' )
 
 		if AttType == 'photo' or AttType == 'sticker':
-			module.bot.send_photo( config.getCell( 'vk_' + idd ), Link )
+			module.bot.send_message( config.getCell( 'vk_' + idd ), Link )
 
 		elif AttType == 'doc' or AttType == 'gif' or AttType == 'audio':
 			module.bot.send_document( config.getCell( 'vk_' + idd ), Link )
