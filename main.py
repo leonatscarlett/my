@@ -92,8 +92,8 @@ def getAttachments( msg ):
 
 		elif AttType == 'sticker': # Проверка на стикеры:
 			# Можно 256 или 512, но будет слишком огромная пикча
-			if Attachment.get( 'sticker' ):
-				attachments = Attachment.get( 'sticker' )
+			if Attachment.get( 'photo_128' ):
+				attachments = Attachment.get( 'photo_128' )
 
 		elif AttType == 'audio':
 			if Attachment.get( 'url' ):
