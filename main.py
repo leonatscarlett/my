@@ -69,9 +69,11 @@ def getAttachments( msg ):
 		Attachment = att[AttType]
 
 		if AttType == 'photo': # Проверка на тип фотографии
+			
 
 			# Различные типы фото
-			if Attachment.get( 'src' ):
+			for src in sizes['sizes'][0:]:
+				if Attachment.get( 'src' ):
 				attachments = Attachment.get( 'src' )
 
 		elif AttType == 'doc': # Проверка на тип документа:
