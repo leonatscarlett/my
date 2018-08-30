@@ -402,6 +402,12 @@ def listener( messages ):
 			FilePath = module.bot.get_file( m.sticker.file_id ).file_path
 
 			CheckRedirect_telegram( str( m.chat.id ), str( m.text ), GetUserTName(m.from_user), str( FilePath ) )
+			
+		elif m.content_type == 'photo':
+			
+			FilePath = module.bot.get_file(message.photo[len(message.photo)-1].file_id)
+			
+			CheckRedirect_telegram( str( m.chat.id ), str( m.text ), GetUserTName(m.from_user), str( FilePath ) )
 
 
 def init_telegram():
@@ -501,6 +507,16 @@ def SaveSticker( StickerURL, Attachment ):
 
 	Stickers = AddStickerIntoVK( path, Attachment[1] )
 	db.AddStickerIntoDb( Stickers )
+	
+#Загрузка фото в ВК
+def AddPhotoIntoVK( path, Photo ):
+	OurFile = path
+
+	upload = vk_api.VkUpload( vk_session )
+	photo = upload.photo( OurFile , album_id = config.getCell( 'vk_album_id' ) )
+
+	OurVK = 'photo{}_{}'.format( photo[0]['owner_id'], photo[0]['id'] )
+	
 
 # Разработчикам на заметку:
 # Telegram та ещё поехавшая вещь, иногда аттачменты идут с расширением файла, иногда - без него
